@@ -27,7 +27,9 @@ export default function RootLayout({
         {/* inter.className apply the font to all acrose the file or whatever inside the below body tage */}
         <body className={`${inter.className} bg-dark-1`}>
           {/* here we are rendering the children */}
-          {children}
+          <div className="w-full flex justify-center items-center min-h-screen">
+            {children}
+          </div>
         </body>
       </html>
     </ClerkProvider>
