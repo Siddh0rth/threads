@@ -10,12 +10,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { fetchUser } from "@/lib/actions/user.action";
 
-async function Page({ params }: { params: { id: string } }) {
+async function Page({ params }: { params: { id: string }}) {
   const user = await currentUser();
   if (!user) return null;
 
   const userInfo = await fetchUser(params.id);
-  if (!userInfo?.onboarded) redirect("/onboarding");
+
+  if (!userInfo?.onboarded) redirect('/onboarding');
 
   return (
     <section>
@@ -44,12 +45,13 @@ async function Page({ params }: { params: { id: string } }) {
 
                 {tab.label === "Threads" && (
                   <p className='ml-1 rounded-sm bg-light-4 px-2 py-1 !text-tiny-medium text-light-2'>
-                    {userInfo.threads.length}
+                    {userInfo?.threads?.length}
                   </p>
                 )}
               </TabsTrigger>
             ))}
           </TabsList>
+
           {profileTabs.map((tab) => (
             <TabsContent
               key={`content-${tab.label}`}
