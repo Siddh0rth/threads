@@ -30,7 +30,7 @@ export async function createThread({
     //update user model
     //update community model
     await User.findByIdAndUpdate(author, {
-      $push: { threads: createThread._id },
+      $push: { threads: createdThread._id },
     });
 
     revalidatePath(path);
