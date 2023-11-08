@@ -123,3 +123,54 @@ export async function getActivity(userId: string) {
     throw new error(`Failed to fetch activity: ${error.message}`);
   }
 }
+
+export async function fetchUsers({
+  userId,
+  searchString = "",
+  pageNumber = 1,
+  pageSize = 20,
+  sortBy = "desc",
+}: {
+  userId: string;
+  searchString?: string;
+  pageNumber?: number;
+  pageSize?: number;
+  sortBy?: SortOrder;
+}) {
+  try {
+    connectToDB();
+    //preparing for the skipping
+    const skipAmount = (pageNumber - 1) * pageSize;
+
+    const regex = new RegExp(searchString);
+    //fetching the user from database
+    const query: FilterQuery<typeof User> = {
+      id: { $ne: userId }, //$ne means is (not equal to  userId)
+    };
+    //here we are doing the searching out of the result
+    if (searchString.trim() !== "") {
+      query.$or = [
+        { username: { $regex: regex } },
+        { name: { $regex: regex } },
+      ];
+    }
+
+    //now we are going to do the sorting
+    const sortOption = { createdAt: sortBy };
+
+    const usersQuery = User.find(query)
+      .sort(sortOption)
+      .skip(skipAmount)
+      .limit(pageSize);
+
+    const totalUserCount = await User.countDocuments(query);
+
+    const users = await usersQuery.exec();
+
+    const isNext = totalUserCount > skipAmount + User.length;
+
+    return { users, isNext };
+  } catch (error: any) {
+    throw new Error(`Failed to fetch users: ${error.message}`);
+  }
+}
