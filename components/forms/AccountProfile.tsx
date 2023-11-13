@@ -3,7 +3,6 @@
 import * as z from "zod";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
-// import { ChangeEvent, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
@@ -16,18 +15,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { userValidation } from "@/lib/validation/user";
 import { ChangeEvent, useState } from "react";
 import { Textarea } from "../ui/textarea";
 import { isBase64Image } from "@/lib/utils";
 import { useUploadThing } from "@/lib/uploadthing";
 import { updateUser } from "@/lib/actions/user.action";
 import { usePathname, useRouter } from "next/navigation";
+import { UserValidation } from "@/lib/validation/user";
 
-// import { useUploadThing } from "@/lib/uploadthing";
-// import { isBase64Image } from "@/lib/utils";
-
-// import { UserValidation } from "@/lib/validations/user";
 
 interface Props {
   user: {
@@ -50,7 +45,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
   const pathname = usePathname();
 
   const form = useForm({
-    resolver: zodResolver(userValidation),
+    resolver: zodResolver(UserValidation),
     // dafual value is going to be object
     defaultValues: {
       profile_photo: user?.image ? user.image : "",
@@ -85,7 +80,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     }
   };
 
-  const onSubmit = async (values: z.infer<typeof userValidation>) => {
+  const onSubmit = async (values: z.infer<typeof UserValidation>) => {
     const blob = values.profile_photo;
 
     const hasImageChanged = isBase64Image(blob);

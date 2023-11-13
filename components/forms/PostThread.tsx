@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-
 import { ThreadValidation } from "@/lib/validation/thread";
 import { createThread } from "@/lib/actions/thread.action";
 

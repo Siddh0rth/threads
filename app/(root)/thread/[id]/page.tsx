@@ -5,65 +5,61 @@ import { redirect } from "next/navigation";
 import { fetchThreadById } from "@/lib/actions/thread.action";
 import Comment from "@/components/forms/Comment";
 
-
 //this param is we are getting from the top of the url so that we can get the data from particular id...
 const Page = async ({ params }: { params: { id: string } }) => {
+  if (!params.id) return null;
 
-    if (!params.id) return null;
+  const user = await currentUser();
+  if (!user) return null;
 
-    const user = await currentUser();
-    if (!user) return null;
+  // to fetch the data from our own database
+  const userInfo = await fetchUser(user.id);
+  if (!userInfo?.onboarded) redirect("/onboarding");
 
-    // to fetch the data from our own database
-    const userInfo = await fetchUser(user.id);
-    if (!userInfo?.onboarded) redirect('/onboarded'); 
+  const thread = await fetchThreadById(params.id);
 
-    const thread = await fetchThreadById(params.id);
+  return (
+    <section className="relative">
+      <div>
+        <ThreadCard
+          key={thread._id}
+          id={thread._id}
+          currentUserId={user?.id || ""}
+          parentId={thread.parentId}
+          content={thread.text}
+          author={thread.author}
+          community={thread.community}
+          createdAt={thread.createdAt}
+          comments={thread.children}
+        />
+      </div>
 
+      <div className="mt-7">
+        <Comment
+          threadId={params.id}
+          currentUserImg={user.imageUrl}
+          currentUserId={JSON.stringify(userInfo._id)}
+        />
+      </div>
 
-    return ( 
-        <section className="relative">
-            <div>
-                <ThreadCard
-                    key={thread._id}
-                    id={thread._id}
-                    currentUserId={user?.id || ""}
-                    parentId={thread.parentId}
-                    content={thread.text}
-                    author={thread.author}
-                    community={thread.community}
-                    createdAt={thread.createdAt}
-                    comments={thread.children}
-                />
-            </div>
-            
-            <div className="mt-7">
-                <Comment
-                    threadId={thread.id}
-                    currentUserImg={userInfo.image}
-                    currentUserId={JSON.stringify(userInfo._id)}
-                />
-            </div>
-
-            <div className="mt-10">
-                {thread.children.map((childItem: any) => (
-                    <ThreadCard
-                        key={childItem._id}
-                        id={childItem._id}
-                        currentUserId={user?.id || ""}
-                        parentId={childItem.parentId}
-                        content={childItem.text}
-                        author={childItem.author}
-                        community={childItem.community}
-                        createdAt={childItem.createdAt}
-                        comments={childItem.children}
-                        isComment
-                    />
-                ))}
-            </div>
-        </section>
-    )
+      <div className="mt-10">
+        {thread.children.map((childItem: any) => (
+          <ThreadCard
+            key={childItem._id}
+            id={childItem._id}
+            currentUserId={user.id}
+            parentId={childItem.parentId}
+            content={childItem.text}
+            author={childItem.author}
+            community={childItem.community}
+            createdAt={childItem.createdAt}
+            comments={childItem.children}
+            isComment
+          />
+        ))}
+      </div>
+    </section>
+  );
 };
 
 export default Page;
-
